@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using DatingApp.API.Data;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -12,6 +14,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 
 namespace DatingApp.API
 {
@@ -32,6 +35,19 @@ namespace DatingApp.API
             services.AddControllers();
             // For API corse issue  we need to add this service 
             services.AddCors();
+            /// for every http request it creates an instance and use the same instance for the requests with in the scope
+            services.AddScoped<IAuthRepository,AuthorityRepository>();
+            // for authentication 
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                 .AddJwtBearer(options => {
+                      options.TokenValidationParameters =new TokenValidationParameters 
+                      {
+                           ValidateIssuerSigningKey =true,
+                           IssuerSigningKey =  new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Configuration.GetSection("AppSettings :Token").Value)),
+                           ValidateIssuer = false, // because we are in localhost
+                           ValidateAudience =false  // because we are in localhost            
+                      }
+                 });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

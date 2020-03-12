@@ -9,5 +9,7 @@ namespace DatingApp.API.Data
 
 // it will create the Table with name Values 
         public DbSet<Value> Values {get;set;}
+
+        public DbSet<User> USers  {get; set;}
     }
 }
